@@ -1,0 +1,141 @@
+% Предупреждать об устаревших командах
+\RequirePackage[l2tabu,orthodox]{nag}
+
+% Класс документа и опции
+\documentclass[twoside,onecolumn,final,12pt]{extarticle}
+
+% Размер страницы и поля
+\usepackage[a4paper]{geometry}
+\geometry{left=25mm,right=15mm}
+\geometry{top=15mm,bottom=20mm}
+
+% Типографская решетка
+\usepackage[columns=1]{typogrid}
+
+% Математика
+\usepackage{amsmath,amsfonts,amssymb,amsthm}
+
+% Локализация и шрифты
+\usepackage{ifxetex}
+\ifxetex
+    \usepackage{polyglossia}
+    \setdefaultlanguage{russian}
+    \setotherlanguage{english}
+
+    % Шрифты STIX 2 и Paratype
+    % https://www.stixfonts.org/
+    % https://www.paratype.ru/
+    \setmainfont{STIX Two Text}
+    \setsansfont{PT Sans}
+    \setmonofont{PT Mono}
+    \defaultfontfeatures{Scale=MatchLowercase,Ligatures=TeX}
+    \usepackage{unicode-math}
+    \setmathfont{STIX Two Math}
+
+    \usepackage{xunicode}
+    \usepackage{xltxtra}
+\else
+    \usepackage[utf8]{inputenc}
+    \usepackage[english,russian]{babel}
+\fi
+
+% Колонтитулы
+\usepackage{fancyhdr}
+\fancyhead{}
+\fancyfoot[LO,RE,C]{}
+\fancyfoot[RO,LE]{\thepage}
+\renewcommand\headrulewidth{0pt}
+\pagestyle{fancy}
+\fancypagestyle{plain}{}
+
+% Первый абзац с красной строки
+\usepackage{indentfirst}
+
+% Залезание строк на поля и висящие строки
+\usepackage{ifdraft}
+\ifdraft{\fussy}{
+    \sloppy
+    \usepackage[all]{nowidow}
+}
+
+% Микротипографические улучшения текста
+\usepackage{microtype}
+
+% Форматирование заголовков
+\usepackage[medium,center,compact]{titlesec}
+% Точка после номера в заголовке
+\AtBeginDocument{\titlelabel{\thetitle. }}
+
+% Точки после номеров в содержании
+\usepackage[dotinlabels]{titletoc}
+
+% Точка в подписях рисунков и таблиц
+\usepackage[labelsep=period]{caption}
+
+% Состав содержания
+\usepackage[nottoc,notindex]{tocbibind}
+
+% Предметный указатель
+\usepackage{imakeidx}
+\makeindex[intoc]
+
+% Рисунки
+\usepackage{graphicx,tikz}
+\graphicspath{{./}{figures/}{diagrams/}}
+
+% Тонкая настройка таблиц
+\usepackage{booktabs}
+
+% Гиперссылки и PDF-оглавление
+\usepackage[hidelinks,bookmarksnumbered]{hyperref}
+
+% Команды для ненумеруемых разделов, включаемых в содержание (имеют хаки
+% для корректной работы hyperref совместно с titlesec)
+\newcommand{\Chapter}[1]{
+    \chapter*{#1}
+    \addcontentsline{toc}{chapter}{#1}
+}
+\newcommand\sectionbreak{}
+\newcommand{\Section}[1]{
+    \renewcommand\sectionbreak\phantomsection
+    \section*{#1}
+    \addcontentsline{toc}{section}{#1}
+    \renewcommand\sectionbreak{}
+}
+\newcommand\subsectionbreak{}
+\newcommand{\Subsection}[1]{
+    \renewcommand\subsectionbreak\phantomsection
+    \subsection*{#1}
+    \addcontentsline{toc}{subsection}{#1}
+    \renewcommand\subsectionbreak{}
+}
+
+% Стиль списка литературы
+\bibliographystyle{unsrt}
+
+% Теоремоподобные окружения
+\theoremstyle{definition}
+    \newtheorem{definition}{Определение}[section]
+    \newtheorem{axiom}{Аксиома}[section]
+    \newtheorem{example}{Пример}[section]
+    \newtheorem{exercise}{Упражнение}[section]
+\theoremstyle{plain}
+    \newtheorem{theorem}{Теорема}[section]
+    \newtheorem{proposition}[theorem]{Утверждение}
+    \newtheorem{metatheorem}{Метатеорема}[section]
+    \newtheorem{lemma}{Лемма}[section]
+\theoremstyle{remark}
+    \newtheorem*{remark}{Замечание}
+
+% Команды объявления названия и автора документа
+\newcommand\Title[1]{
+    \title{#1}
+    \hypersetup{pdftitle={#1}}
+}
+\newcommand\Author[1]{
+    \author{#1}
+    \hypersetup{pdfauthor={#1}}
+}
+
+% Дата выпуска документа
+\date{\today}
