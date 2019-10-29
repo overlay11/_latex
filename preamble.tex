@@ -2,7 +2,8 @@
 \RequirePackage[l2tabu,orthodox]{nag}
 
 % Класс документа и опции
-\documentclass[twoside,onecolumn,final,12pt]{extarticle}
+\providecommand\Documentclass{extarticle}
+\documentclass[twoside,onecolumn,final,12pt]{\Documentclass}
 
 % Размер страницы и поля
 \usepackage[a4paper]{geometry}
