@@ -10,26 +10,30 @@ PROJECTDIR := $(shell pwd)
 PROJECT := $(shell basename "$(PROJECTDIR)")
 TEXMAIN ?= $(PROJECT).tex
 
-PANDOC_FLAGS ?= --top-level-division=section
+TOP_LEVEL ?= section
+PANDOC_FLAGS = --top-level-division=$(TOP_LEVEL)
 
 MACROGV := $(shell find diagrams -name '*.gv.m4')
 PDF_FROM_MACROGV = $(MACROGV:.gv.m4=.pdf)
 
-MARKDOWN := $(shell find sections chapters -name '*.md')
+MARKDOWN := $(shell find $(TOP_LEVEL)s -name '*.md')
 TEX_FROM_MARKDOWN = $(MARKDOWN:.md=.tex)
 
-RSTEXT := $(shell find sections chapters -name '*.rst')
+RSTEXT := $(shell find $(TOP_LEVEL)s -name '*.rst')
 TEX_FROM_RSTEXT = $(RSTEXT:.rst=.tex)
 
 SVG := $(shell find figures -name '*.svg')
 PDF_FROM_SVG = $(SVG:.svg=.pdf)
 
-.PHONY: pdf tex clean
+.PHONY: pdf tex clean init
 
 pdf: tex $(PDF_FROM_MACROGV) $(PDF_FROM_SVG)
 	latexmk $(LATEXMK_FLAGS) $(TEXMAIN)
 
 tex: $(TEX_FROM_MARKDOWN) $(TEX_FROM_RSTEXT)
+
+init:
+	mkdir -p $(TOP_LEVEL)s figures diagrams
 
 clean:
 	latexmk $(LATEXMK_FLAGS) -C
