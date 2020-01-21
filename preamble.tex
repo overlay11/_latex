@@ -2,8 +2,9 @@
 \RequirePackage[l2tabu,orthodox]{nag}
 
 % Класс документа и опции
-\providecommand\Documentclass{extarticle}
-\documentclass[twoside,onecolumn,final,12pt]{\Documentclass}
+\providecommand\documentcls{extarticle}
+\providecommand\documentmode{final}
+\documentclass[twoside,onecolumn,\documentmode,12pt]{\documentcls}
 
 % Размер страницы и поля
 \usepackage[a4paper]{geometry}
@@ -26,10 +27,9 @@
     % Шрифты STIX 2 и Paratype
     % https://www.stixfonts.org/
     % https://www.paratype.ru/
-    \setmainfont{STIX Two Text}
+    \setmainfont{STIX Two Text}[Ligatures=TeX]
     \setsansfont{PT Sans}
-    \setmonofont{PT Mono}
-    \defaultfontfeatures{Scale=MatchLowercase,Ligatures=TeX}
+    \setmonofont{PT Mono}[Scale=MatchLowercase]
     \usepackage{unicode-math}
     \setmathfont{STIX Two Math}
 
@@ -67,6 +67,9 @@
 % Точка после номера в заголовке
 \AtBeginDocument{\titlelabel{\thetitle. }}
 
+% Расстояния между абзацами
+\usepackage{nccparskip}
+
 % Точки после номеров в содержании
 \usepackage[dotinlabels]{titletoc}
 
@@ -84,11 +87,22 @@
 \usepackage{graphicx,tikz}
 \graphicspath{{./}{figures/}{diagrams/}}
 
+% Альбомная ориентация рисунков и таблиц
+\usepackage{pdflscape}
+
 % Тонкая настройка таблиц
 \usepackage{booktabs}
 
+% Многостраничные таблицы
+\usepackage{longtable}
+
+% Гиперссылки, допускающие перенос
+\usepackage{xurl}
+\urlstyle{same}
+
 % Гиперссылки и PDF-оглавление
-\usepackage[hidelinks,bookmarksnumbered]{hyperref}
+\usepackage[numbered]{bookmark}
+\hypersetup{hidelinks}
 
 % Команды для ненумеруемых разделов, включаемых в содержание (имеют хаки
 % для корректной работы hyperref совместно с titlesec)
@@ -111,6 +125,26 @@
     \renewcommand\subsectionbreak{}
 }
 
+% Команда вставки рисунка
+\newcommand\Figure[3][]{
+    \begin{figure}[htp]
+        \centering
+        \includegraphics[#3]{#2}
+        \caption{#1}
+        \label{fig:#2}
+    \end{figure}
+}
+
+% Окружение для вставки таблицы
+\newenvironment{Table}[2][]{
+    \begin{table}
+    \centering
+    \caption{#1}
+    \label{tab:#2}
+}{
+    \end{table}
+}
+
 % Стиль списка литературы
 \bibliographystyle{unsrt}
 
@@ -127,6 +161,9 @@
     \newtheorem{lemma}{Лемма}[section]
 \theoremstyle{remark}
     \newtheorem*{remark}{Замечание}
+
+% Совместимость с pandoc
+\newcommand\tightlist{\setlength\itemsep{0pt}\setlength\parskip{0pt}}
 
 % Команды объявления названия и автора документа
 \newcommand\Title[1]{

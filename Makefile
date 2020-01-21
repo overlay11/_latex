@@ -1,55 +1,101 @@
-DOCUMENT_CLASS ?= extarticle
-LATEXMK_ENGINE_FLAG ?= -pdf
-PRETEX = \newcommand\Documentclass{$(DOCUMENT_CLASS)}
-LATEXMK_FLAGS = $(LATEXMK_ENGINE_FLAG) -usepretex='$(PRETEX)' -use-make -bibtex-cond1 -silent
+class ?= extarticle
+mode ?= final
+engineflag ?= -pdf
+texmain ?= $(lastword $(subst /, ,$(abspath .))).tex
+toplevel ?= section
 
-DIAGEN_FLAGS ?= -D_FONTNAME="PT Sans"
-DIAGEN ?= ~/bin/diagen
 
-PROJECTDIR := $(shell pwd)
-PROJECT := $(shell basename "$(PROJECTDIR)")
-TEXMAIN ?= $(PROJECT).tex
+.PHONY: all pdf pdf-from-svg tex-from-md tex-from-rst pdf-from-macrogv \
+png-from-scad tex-from-csv clean
 
-TOP_LEVEL ?= section
-PANDOC_FLAGS = --top-level-division=$(TOP_LEVEL)
+all: pdf
 
-MACROGV := $(shell find diagrams -name '*.gv.m4')
-PDF_FROM_MACROGV = $(MACROGV:.gv.m4=.pdf)
 
-MARKDOWN := $(shell find $(TOP_LEVEL)s -name '*.md')
-TEX_FROM_MARKDOWN = $(MARKDOWN:.md=.tex)
-
-RSTEXT := $(shell find $(TOP_LEVEL)s -name '*.rst')
-TEX_FROM_RSTEXT = $(RSTEXT:.rst=.tex)
-
-SVG := $(shell find figures -name '*.svg')
-PDF_FROM_SVG = $(SVG:.svg=.pdf)
-
-.PHONY: pdf tex clean init
-
-pdf: tex $(PDF_FROM_MACROGV) $(PDF_FROM_SVG)
-	latexmk $(LATEXMK_FLAGS) $(TEXMAIN)
-
-tex: $(TEX_FROM_MARKDOWN) $(TEX_FROM_RSTEXT)
-
-init:
-	mkdir -p $(TOP_LEVEL)s figures diagrams
-
-clean:
-	latexmk $(LATEXMK_FLAGS) -C
-	rm -f $(PDF_FROM_MACROGV) $(TEX_FROM_MARKDOWN) $(TEX_FROM_RSTEXT) $(PDF_FROM_SVG)
+PANDOC = pandoc
+PANDOC_FLAGS = --top-level-division=$(toplevel)
 
 %.tex: %.md
-	pandoc $(PANDOC_FLAGS) -o $@ $<
+	$(PANDOC) $(PANDOC_FLAGS) -o $@ $<
 
 %.tex: %.rst
-	pandoc $(PANDOC_FLAGS) -o $@ $<
+	$(PANDOC) $(PANDOC_FLAGS) -o $@ $<
+
+%.tex: %.csv
+	$(PANDOC) $(PANDOC_FLAGS) -o $@ $<
+
+%.tex: %.txt
+	$(PANDOC) $(PANDOC_FLAGS) -o $@ $<
+
+TEX_FROM_MD := $(patsubst %.md,%.tex,$(shell find . -name '*.md'))
+TEX_FROM_RST := $(patsubst %.rst,%.tex,$(shell find . -name '*.rst'))
+TEX_FROM_CSV := $(patsubst %.csv,%.tex,$(shell find . -name '*.csv'))
+
+tex-from-md: $(TEX_FROM_MD)
+tex-from-rst: $(TEX_FROM_RST)
+tex-from-csv: $(TEX_FROM_CSV)
+
+
+INKSCAPE = inkscape
+INKSCAPE_FLAGS = -z --export-ignore-filters
 
 %.pdf: %.svg
-	inkscape -A "$(PROJECTDIR)/$@" --export-ignore-filters "$(PROJECTDIR)/$<"
+	$(INKSCAPE) $(INKSCAPE_FLAGS) $(INKSCAPE_PDF_FLAGS) -A '$(abspath $@)' '$(abspath $<)'
 
 %.eps: %.svg
-	inkscape -E "$(PROJECTDIR)/$@" --export-ignore-filters "$(PROJECTDIR)/$<"
+	$(INKSCAPE) $(INKSCAPE_FLAGS) $(INKSCAPE_EPS_FLAGS) -E '$(abspath $@)' '$(abspath $<)'
+
+PDF_FROM_SVG := $(patsubst %.svg,%.pdf,$(shell find . -name '*.svg'))
+
+pdf-from-svg: $(PDF_FROM_SVG)
+
+
+POTRACE = potrace -s
+
+%.svg: %.pbm
+	$(POTRACE) $(POTRACE_FLAGS) -o $@ $<
+
+
+# https://github.com/overlay11/diagen.sh
+DIAGEN = ~/bin/diagen
+DIAGEN_FLAGS = -D_FONTNAME='PT Sans'
 
 %.svg: %.gv.m4
 	$(DIAGEN) $< $@ $(DIAGEN_FLAGS)
+
+PDF_FROM_MACROGV := $(patsubst %.gv.m4,%.pdf,$(shell find . -name '*.gv.m4'))
+
+pdf-from-macrogv: $(PDF_FROM_MACROGV)
+
+
+eq = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
+
+OPENSCAD = openscad
+OPENSCAD_PNG_FLAGS = $(if $(call eq,$(mode),final),--render,--preview) \
+--projection ortho --viewall --autocenter --colorscheme Tomorrow
+
+%.svg: %.scad
+	$(OPENSCAD) $(OPENSCAD_FLAGS) $(OPENSCAD_SVG_FLAGS) -o $@ $<
+
+%.png: %.scad
+	$(OPENSCAD) $(OPENSCAD_FLAGS) $(OPENSCAD_PNG_FLAGS) -o $@ $<
+
+PNG_FROM_SCAD := $(patsubst %.scad,%.png,$(shell find . -name '*.scad'))
+
+png-from-scad: $(PNG_FROM_SCAD)
+
+
+LATEXMK = latexmk
+PRETEX = \newcommand\documentcls{$(class)} \
+\newcommand\documentmode{$(mode)}
+LATEXMK_FLAGS = $(engineflag) -usepretex='$(PRETEX)' -use-make -bibtex-cond1 -silent
+
+tex: tex-from-md tex-from-rst tex-from-csv
+
+pdf: tex pdf-from-macrogv pdf-from-svg png-from-scad
+	$(LATEXMK) $(LATEXMK_FLAGS) $(texmain)
+
+GENERATED_TEX = $(TEX_FROM_MD) $(TEX_FROM_RST) $(TEX_FROM_CSV)
+
+clean:
+	$(LATEXMK) $(LATEXMK_FLAGS) -C
+	rm -f $(PDF_FROM_MACROGV) $(PDF_FROM_SVG) $(PNG_FROM_SCAD) $(GENERATED_TEX)
