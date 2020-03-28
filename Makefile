@@ -6,7 +6,7 @@ toplevel ?= section
 
 
 .PHONY: all pdf pdf-from-svg tex-from-md tex-from-rst pdf-from-macrogv \
-png-from-scad tex-from-csv clean
+png-from-scad tex-from-csv pdf-from-plt clean
 
 all: pdf
 
@@ -84,6 +84,16 @@ PNG_FROM_SCAD := $(patsubst %.scad,%.png,$(shell find . -name '*.scad'))
 png-from-scad: $(PNG_FROM_SCAD)
 
 
+GNUPLOT = gnuplot
+
+%.svg: %.plt
+	$(GNUPLOT) $(GNUPLOT_FLAGS) -e "set terminal svg; set output '$@'" $<
+
+PDF_FROM_PLT := $(patsubst %.plt,%.pdf,$(shell find . -name '*.plt'))
+
+pdf-from-plt: $(PDF_FROM_PLT)
+
+
 LATEXMK = latexmk
 PRETEX = \newcommand\documentcls{$(class)} \
 \newcommand\documentmode{$(mode)}
@@ -91,11 +101,12 @@ LATEXMK_FLAGS = $(engineflag) -usepretex='$(PRETEX)' -use-make -bibtex-cond1 -si
 
 tex: tex-from-md tex-from-rst tex-from-csv
 
-pdf: tex pdf-from-macrogv pdf-from-svg png-from-scad
+pdf: tex pdf-from-macrogv pdf-from-svg png-from-scad pdf-from-plt
 	$(LATEXMK) $(LATEXMK_FLAGS) $(texmain)
 
 GENERATED_TEX = $(TEX_FROM_MD) $(TEX_FROM_RST) $(TEX_FROM_CSV)
+INTERMEDIATE_PDF = $(PDF_FROM_MACROGV) $(PDF_FROM_SVG) $(PDF_FROM_PLT)
 
 clean:
 	$(LATEXMK) $(LATEXMK_FLAGS) -C
-	rm -f $(PDF_FROM_MACROGV) $(PDF_FROM_SVG) $(PNG_FROM_SCAD) $(GENERATED_TEX)
+	rm -f $(PNG_FROM_SCAD) $(GENERATED_TEX) $(INTERMEDIATE_PDF)
