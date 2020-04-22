@@ -5,26 +5,37 @@ texmain ?= $(lastword $(subst /, ,$(abspath .))).tex
 toplevel ?= section
 
 
-.PHONY: all pdf pdf-from-svg tex-from-md tex-from-rst pdf-from-macrogv \
+.PHONY: pdf pdf-from-svg tex-from-md tex-from-rst pdf-from-macrogv \
 png-from-scad tex-from-csv pdf-from-plt clean
 
-all: pdf
+.DEFAULT_GOAL := pdf
+
+SHELL = /bin/sh
+
+eq = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
 
 
 PANDOC = pandoc
 PANDOC_FLAGS = --top-level-division=$(toplevel)
 
+pandoc-standalone = echo '\input{_latex/preamble}' > $@; \
+echo '\\begin{document}' >> $@; \
+$(PANDOC) $(PANDOC_FLAGS) -t latex $< >> $@; \
+echo '\end{document}' >> $@
+
+pandoc-fragment = $(PANDOC) $(PANDOC_FLAGS) -o $@ $<
+
 %.tex: %.md
-	$(PANDOC) $(PANDOC_FLAGS) -o $@ $<
+	$(if $(call eq,$@,$(texmain)),$(pandoc-standalone),$(pandoc-fragment))
 
 %.tex: %.rst
-	$(PANDOC) $(PANDOC_FLAGS) -o $@ $<
+	$(if $(call eq,$@,$(texmain)),$(pandoc-standalone),$(pandoc-fragment))
 
 %.tex: %.csv
-	$(PANDOC) $(PANDOC_FLAGS) -o $@ $<
+	$(pandoc-fragment)
 
 %.tex: %.txt
-	$(PANDOC) $(PANDOC_FLAGS) -o $@ $<
+	$(pandoc-fragment)
 
 TEX_FROM_MD := $(patsubst %.md,%.tex,$(shell find . -name '*.md'))
 TEX_FROM_RST := $(patsubst %.rst,%.tex,$(shell find . -name '*.rst'))
@@ -66,8 +77,6 @@ PDF_FROM_MACROGV := $(patsubst %.gv.m4,%.pdf,$(shell find . -name '*.gv.m4'))
 
 pdf-from-macrogv: $(PDF_FROM_MACROGV)
 
-
-eq = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
 
 OPENSCAD = openscad
 OPENSCAD_PNG_FLAGS = $(if $(call eq,$(mode),final),--render,--preview) \
