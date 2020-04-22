@@ -21,7 +21,7 @@
 \usepackage{ifxetex}
 \ifxetex
     \usepackage{polyglossia}
-    \setdefaultlanguage{russian}
+    \setdefaultlanguage[indentfirst]{russian}
     \setotherlanguage{english}
 
     % Шрифты STIX 2 и Paratype
@@ -38,6 +38,9 @@
 \else
     \usepackage[utf8]{inputenc}
     \usepackage[english,russian]{babel}
+
+    % Первый абзац с красной строки
+    \usepackage{indentfirst}
 \fi
 
 % Колонтитулы
@@ -48,9 +51,6 @@
 \renewcommand\headrulewidth{0pt}
 \pagestyle{fancy}
 \fancypagestyle{plain}{}
-
-% Первый абзац с красной строки
-\usepackage{indentfirst}
 
 % Залезание строк на поля и висящие строки
 \usepackage{ifdraft}
