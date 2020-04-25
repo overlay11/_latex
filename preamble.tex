@@ -62,10 +62,10 @@
 % Микротипографические улучшения текста
 \usepackage{microtype}
 
-% Форматирование заголовков
-\usepackage[medium,center,compact]{titlesec}
 % Точка после номера в заголовке
-\AtBeginDocument{\titlelabel{\thetitle. }}
+\usepackage{secdot}
+\sectionpunct{section}{.\space}
+\sectionpunct{subsection}{.\space}
 
 % Расстояния между абзацами
 \usepackage{nccparskip}
@@ -104,25 +104,18 @@
 \usepackage[numbered,\documentmode]{bookmark}
 \hypersetup{hidelinks}
 
-% Команды для ненумеруемых разделов, включаемых в содержание (имеют хаки
-% для корректной работы hyperref совместно с titlesec)
+% Команды для ненумеруемых разделов, включаемых в содержание
 \newcommand{\uchapter}[1]{
     \chapter*{#1}
     \addcontentsline{toc}{chapter}{#1}
 }
-\newcommand\sectionbreak{}
 \newcommand{\usection}[1]{
-    \renewcommand\sectionbreak\phantomsection
     \section*{#1}
     \addcontentsline{toc}{section}{#1}
-    \renewcommand\sectionbreak{}
 }
-\newcommand\subsectionbreak{}
 \newcommand{\usubsection}[1]{
-    \renewcommand\subsectionbreak\phantomsection
     \subsection*{#1}
     \addcontentsline{toc}{subsection}{#1}
-    \renewcommand\subsectionbreak{}
 }
 
 % Команда вставки рисунка
