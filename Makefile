@@ -1,7 +1,7 @@
 class ?= extarticle
 mode ?= final
 engineflag ?= -pdf
-texmain ?= $(lastword $(subst /, ,$(abspath .))).tex
+main ?= $(lastword $(subst /, ,$(abspath .)))
 toplevel ?= section
 
 
@@ -18,7 +18,10 @@ eq = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
 PANDOC = pandoc
 PANDOC_FLAGS = --top-level-division=$(toplevel)
 
-pandoc-standalone = echo '\input{_latex/preamble}' > $@; \
+TEXMAIN = $(main).tex
+PREAMBLE := $(firstword $(shell find . -name 'preamble.tex'))
+
+pandoc-standalone = echo '\input{$(PREAMBLE)}' > $@; \
 echo '\\begin{document}' >> $@; \
 $(PANDOC) $(PANDOC_FLAGS) -t latex $< >> $@; \
 echo '\end{document}' >> $@
@@ -26,10 +29,10 @@ echo '\end{document}' >> $@
 pandoc-fragment = $(PANDOC) $(PANDOC_FLAGS) -o $@ $<
 
 %.tex: %.md
-	$(if $(call eq,$@,$(texmain)),$(pandoc-standalone),$(pandoc-fragment))
+	$(if $(call eq,$@,$(TEXMAIN)),$(pandoc-standalone),$(pandoc-fragment))
 
 %.tex: %.rst
-	$(if $(call eq,$@,$(texmain)),$(pandoc-standalone),$(pandoc-fragment))
+	$(if $(call eq,$@,$(TEXMAIN)),$(pandoc-standalone),$(pandoc-fragment))
 
 %.tex: %.csv
 	$(pandoc-fragment)
@@ -111,7 +114,7 @@ LATEXMK_FLAGS = $(engineflag) -usepretex='$(PRETEX)' -bibtex-cond1 -silent
 tex: tex-from-md tex-from-rst tex-from-csv
 
 pdf: tex pdf-from-macrogv pdf-from-svg png-from-scad pdf-from-plt
-	$(LATEXMK) $(LATEXMK_FLAGS) $(texmain)
+	$(LATEXMK) $(LATEXMK_FLAGS) $(TEXMAIN)
 
 GENERATED_TEX = $(TEX_FROM_MD) $(TEX_FROM_RST) $(TEX_FROM_CSV)
 INTERMEDIATE_PDF = $(PDF_FROM_MACROGV) $(PDF_FROM_SVG) $(PDF_FROM_PLT)
