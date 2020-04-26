@@ -16,6 +16,8 @@
 
 % Математика
 \usepackage{amsmath,amsfonts,amssymb}
+% Дополнительные символы
+\usepackage[nointegrals]{wasysym}
 
 % Локализация и шрифты
 \usepackage{ifxetex}
@@ -35,6 +37,9 @@
 
     \usepackage{xunicode}
     \usepackage{xltxtra}
+
+    % Знак рубля
+    \newcommand\rub{\symbol{8381}}
 \else
     \usepackage[utf8]{inputenc}
     \usepackage[english,russian]{babel}
@@ -103,6 +108,9 @@
 \usepackage{xurl}
 \urlstyle{same}
 
+% Диагональные дроби
+\usepackage{xfrac}
+
 % Гиперссылки и PDF-оглавление
 \usepackage[numbered,\documentmode]{bookmark}
 \hypersetup{hidelinks}
@@ -163,6 +171,9 @@
 \newtheorem{lemma}{Лемма}[theorem]
 \newtheorem{remark}{Замечание}[remark]
 \ProofStyleParameters{\bfseries\itshape}{Доказательство}
+
+% Знак номера
+\providecommand\No\textnumero
 
 % Совместимость с pandoc
 \newcommand\tightlist{\setlength\itemsep{0pt}\setlength\parskip{0pt}}
