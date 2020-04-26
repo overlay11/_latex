@@ -15,7 +15,7 @@
 \usepackage[columns=1]{typogrid}
 
 % Математика
-\usepackage{amsmath,amsfonts,amssymb,amsthm}
+\usepackage{amsmath,amsfonts,amssymb}
 
 % Локализация и шрифты
 \usepackage{ifxetex}
@@ -69,6 +69,9 @@
 
 % Расстояния между абзацами
 \usepackage{nccparskip}
+
+% Оформление теорем
+\usepackage[indent]{nccthm}
 
 % Точки после номеров в содержании
 \usepackage[dotinlabels]{titletoc}
@@ -145,18 +148,21 @@
 \bibliographystyle{unsrt}
 
 % Теоремоподобные окружения
-\theoremstyle{definition}
-    \newtheorem{definition}{Определение}[section]
-    \newtheorem{axiom}{Аксиома}[section]
-    \newtheorem{example}{Пример}[section]
-    \newtheorem{exercise}{Упражнение}[section]
-\theoremstyle{plain}
-    \newtheorem{theorem}{Теорема}[section]
-    \newtheorem{proposition}[theorem]{Утверждение}
-    \newtheorem{metatheorem}{Метатеорема}[section]
-    \newtheorem{lemma}{Лемма}[section]
-\theoremstyle{remark}
-    \newtheorem*{remark}{Замечание}
+\newtheoremtype{definition}{\bfseries}{}{}
+\renewtheoremtype{remark}{\bfseries\itshape}{}{}
+\AfterTheoremHeaderChar{.}
+\AfterTheoremHeaderSkip{\space}
+\countstyle{section}
+\newtheorem{definition}{Определение}[definition]
+\newtheorem{axiom}{Аксиома}[definition]
+\newtheorem{example}{Пример}[definition]
+\newtheorem{exercise}{Упражнение}[definition]
+\newtheorem{theorem}{Теорема}[theorem]
+\newtheorem{proposition}[theorem]{Утверждение}[theorem]
+\newtheorem{metatheorem}{Метатеорема}[theorem]
+\newtheorem{lemma}{Лемма}[theorem]
+\newtheorem{remark}{Замечание}[remark]
+\ProofStyleParameters{\bfseries\itshape}{Доказательство}
 
 % Совместимость с pandoc
 \newcommand\tightlist{\setlength\itemsep{0pt}\setlength\parskip{0pt}}
