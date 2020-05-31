@@ -50,13 +50,13 @@ tex-from-csv: $(TEX_FROM_CSV)
 
 
 INKSCAPE = inkscape
-INKSCAPE_FLAGS = -z --export-ignore-filters
+INKSCAPE_FLAGS = --export-ignore-filters
 
 %.pdf: %.svg
-	$(INKSCAPE) $(INKSCAPE_FLAGS) $(INKSCAPE_PDF_FLAGS) -A '$(abspath $@)' '$(abspath $<)'
+	$(INKSCAPE) $(INKSCAPE_FLAGS) $(INKSCAPE_PDF_FLAGS) -o $@ $<
 
 %.eps: %.svg
-	$(INKSCAPE) $(INKSCAPE_FLAGS) $(INKSCAPE_EPS_FLAGS) -E '$(abspath $@)' '$(abspath $<)'
+	$(INKSCAPE) $(INKSCAPE_FLAGS) $(INKSCAPE_EPS_FLAGS) -o $@ $<
 
 PDF_FROM_SVG := $(patsubst %.svg,%.pdf,$(shell find . -name '*.svg'))
 
