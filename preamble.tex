@@ -2,8 +2,8 @@
 \RequirePackage[l2tabu,orthodox]{nag}
 
 % Класс документа и опции
-\providecommand\documentcls{extarticle}
-\providecommand\documentmode{final}
+\providecommand{\documentcls}{extarticle}
+\providecommand{\documentmode}{final}
 \documentclass[twoside,onecolumn,\documentmode,12pt]{\documentcls}
 
 % Размер страницы и поля
@@ -20,8 +20,17 @@
 \usepackage[nointegrals]{wasysym}
 
 % Локализация и шрифты
-\usepackage{ifxetex}
-\ifxetex
+\usepackage{iftex}
+\ifpdftex
+    \usepackage[utf8]{inputenc}
+    \usepackage[english,russian]{babel}
+
+    % Прописная латиница
+    \usepackage{mathrsfs}
+
+    % Первый абзац с красной строки
+    \usepackage{indentfirst}
+\else
     \usepackage{polyglossia}
     \setdefaultlanguage[indentfirst]{russian}
     \setotherlanguage{english}
@@ -42,16 +51,7 @@
     \usepackage{xltxtra}
 
     % Знак рубля
-    \newcommand\rub{\symbol{8381}}
-\else
-    \usepackage[utf8]{inputenc}
-    \usepackage[english,russian]{babel}
-
-    % Прописная латиница
-    \usepackage{mathrsfs}
-
-    % Первый абзац с красной строки
-    \usepackage{indentfirst}
+    \newcommand{\rub}{\symbol{8381}}
 \fi
 
 % Колонтитулы
@@ -59,7 +59,7 @@
 \fancyhead{}
 \fancyfoot[LO,RE,C]{}
 \fancyfoot[RO,LE]{\thepage}
-\renewcommand\headrulewidth{0pt}
+\renewcommand{\headrulewidth}{0pt}
 \pagestyle{fancy}
 \fancypagestyle{plain}{}
 
@@ -139,7 +139,7 @@
 }
 
 % Команда вставки рисунка
-\newcommand\includefigure[3][]{
+\newcommand{\includefigure}[3][]{
     \begin{figure}[htp]
         \centering
         \InputIfFileExists{#3}{}{
@@ -153,10 +153,9 @@
 }
 
 % Команда вставки таблицы
-\newcommand\includetable[2]{
+\newcommand{\includetable}[2]{
     \begin{table}[htp]
         \caption{#1}
-        \label{tab:#2}
         \InputIfFileExists{#2}{}{\input{tables/#2}}
     \end{table}
 }
@@ -182,17 +181,36 @@
 \ProofStyleParameters{\bfseries\itshape}{Доказательство}
 
 % Знак номера
-\providecommand\No\textnumero
+\providecommand{\No}{\textnumero}
+
+% Сокращения для стрелок
+\newcommand{\rarr}{\rightarrow}
+\newcommand{\Rarr}{\Rightarrow}
+\newcommand{\uarr}{\uparrow}
+\newcommand{\Uarr}{\Uparrow}
+\newcommand{\larr}{\leftarrow}
+\newcommand{\Larr}{\Leftarrow}
+\newcommand{\darr}{\downarrow}
+\newcommand{\Darr}{\Downarrow}
+\newcommand{\lrarr}{\leftrightarrow}
+\newcommand{\Lrarr}{\Leftrightarrow}
+\newcommand{\rharp}{\rightharpoonup}
+\newcommand{\lharp}{\leftharpoondown}
+\newcommand{\rlharps}{\rightleftharpoons}
+
+% Комплексная логика
+\newcommand{\varneg}{\mathord{\sim}}
+\newcommand{\complexrel}[2]{\mathrel{\mathord{#1}\mathord{#2}}}
 
 % Совместимость с pandoc
-\newcommand\tightlist{\setlength\itemsep{0pt}\setlength\parskip{0pt}}
+\newcommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 
 % Команды объявления названия и автора документа
-\newcommand\settitle[1]{
+\newcommand{\settitle}[1]{
     \title{#1}
     \hypersetup{pdftitle={#1}}
 }
-\newcommand\setauthor[1]{
+\newcommand{\setauthor}[1]{
     \author{#1}
     \hypersetup{pdfauthor={#1}}
 }

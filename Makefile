@@ -107,8 +107,8 @@ pdf-from-plt: $(PDF_FROM_PLT)
 
 
 LATEXMK = latexmk
-PRETEX = \newcommand\documentcls{$(class)} \
-\newcommand\documentmode{$(mode)}
+PRETEX = \newcommand{\documentcls}{$(class)} \
+\newcommand{\documentmode}{$(mode)}
 LATEXMK_FLAGS = $(engineflag) -usepretex='$(PRETEX)' -bibtex-cond1 -silent
 
 tex: tex-from-md tex-from-rst tex-from-csv
