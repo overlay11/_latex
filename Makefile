@@ -5,9 +5,6 @@ main ?= $(lastword $(subst /, ,$(abspath .)))
 toplevel ?= section
 
 
-.PHONY: pdf pdf-from-svg tex-from-md tex-from-rst pdf-from-macrogv \
-png-from-scad tex-from-csv pdf-from-plt clean
-
 .DEFAULT_GOAL := pdf
 
 SHELL = /bin/sh
@@ -48,6 +45,8 @@ tex-from-md: $(TEX_FROM_MD)
 tex-from-rst: $(TEX_FROM_RST)
 tex-from-csv: $(TEX_FROM_CSV)
 
+.PHONY: tex-from-md tex-from-rst tex-from-csv
+
 
 INKSCAPE = inkscape
 INKSCAPE_FLAGS = --export-ignore-filters
@@ -61,6 +60,8 @@ INKSCAPE_FLAGS = --export-ignore-filters
 PDF_FROM_SVG := $(patsubst %.svg,%.pdf,$(shell find . -name '*.svg'))
 
 pdf-from-svg: $(PDF_FROM_SVG)
+
+.PHONY: pdf-from-svg
 
 
 POTRACE = potrace -s
@@ -80,6 +81,8 @@ PDF_FROM_MACROGV := $(patsubst %.gv.m4,%.pdf,$(shell find . -name '*.gv.m4'))
 
 pdf-from-macrogv: $(PDF_FROM_MACROGV)
 
+.PHONY: pdf-from-macrogv
+
 
 OPENSCAD = openscad
 OPENSCAD_PNG_FLAGS = $(if $(call eq,$(mode),final),--render,--preview) \
@@ -95,6 +98,8 @@ PNG_FROM_SCAD := $(patsubst %.scad,%.png,$(shell find . -name '*.scad'))
 
 png-from-scad: $(PNG_FROM_SCAD)
 
+.PHONY: png-from-scad
+
 
 GNUPLOT = gnuplot
 
@@ -104,6 +109,8 @@ GNUPLOT = gnuplot
 PDF_FROM_PLT := $(patsubst %.plt,%.pdf,$(shell find . -name '*.plt'))
 
 pdf-from-plt: $(PDF_FROM_PLT)
+
+.PHONY: pdf-from-plt
 
 
 LATEXMK = latexmk
@@ -122,3 +129,5 @@ INTERMEDIATE_PDF = $(PDF_FROM_MACROGV) $(PDF_FROM_SVG) $(PDF_FROM_PLT)
 clean:
 	$(LATEXMK) $(LATEXMK_FLAGS) -C
 	rm -f $(PNG_FROM_SCAD) $(GENERATED_TEX) $(INTERMEDIATE_PDF)
+
+.PHONY: tex pdf clean
